@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The global coffee economy: an interactive dashboard</title>
+<style>
+  :root {
+    --surface-1: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --border: rgba(11,11,11,0.10);
+    --radius: 8px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: var(--text-primary);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+    line-height: 1.6;
+  }
+  h1 { font-size: 26px; font-weight: 600; margin: 0 0 0.25rem; }
+  h2 { font-size: 20px; font-weight: 600; margin: 0 0 0.25rem; }
+  p.lead { color: var(--text-secondary); font-size: 15px; margin: 0 0 2.5rem; }
+  p.subtitle { color: var(--text-secondary); font-size: 14px; margin: 0 0 0.5rem; }
+  p.caveat { color: var(--text-muted); font-size: 13px; margin: 0 0 1.5rem; }
+  section { margin-bottom: 3rem; }
+  section + section { padding-top: 2rem; border-top: 1px solid var(--border); }
+  input[type="range"] { accent-color: #993C1D; }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<h1>The global coffee economy</h1>
+<p class="lead">From bean to cup: who grows it, who drinks it, and what happens to the price when the weather turns.</p>
+
+<section>
+  <h2>Where your coffee actually comes from</h2>
+  <p class="subtitle">Major exporting countries vs. major importing markets, 2025/26</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem;">
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">World production, 2025/26</p>
+      <p style="font-size:24px;font-weight:500;margin:0;">178.8M bags</p>
+    </div>
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Global market value</p>
+      <p style="font-size:24px;font-weight:500;margin:0;">$461B+</p>
+    </div>
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Brazil and Vietnam combined share</p>
+      <p style="font-size:24px;font-weight:500;margin:0;">54%</p>
+    </div>
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Grown on farms under 5ha</p>
+      <p style="font-size:24px;font-weight:500;margin:0;">75%</p>
+    </div>
+  </div>
+  <div id="coffee-map" style="width:100%;"></div>
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--text-secondary);">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#D85A30;"></span>Net exporter, shaded by volume</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;"></span>Major importing market</span>
+  </div>
+</section>
+
+<section>
+  <h2>What if Latin American coffee yields drop?</h2>
+  <p class="subtitle">Drag the slider to see how a yield shock could move arabica futures, and your latte.</p>
+  <p class="caveat">Illustrative model calibrated to two real episodes (the 2021 Brazil frost and the 2024-25 drought run-up), not a forecast.</p>
+
+  <div style="display:flex;align-items:center;gap:12px;margin:0 0 1.5rem;">
+    <label for="yield-shock" style="font-size:14px;color:var(--text-secondary);">Latin American yield shock</label>
+    <input type="range" id="yield-shock" min="0" max="30" step="1" value="15" style="flex:1;" />
+    <span id="yield-shock-out" style="font-size:14px;font-weight:500;min-width:36px;">15%</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem;">
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Arabica futures</p>
+      <p style="font-size:24px;font-weight:500;margin:0;" id="futures-out">$4.07/lb</p>
+    </div>
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Futures price move</p>
+      <p style="font-size:24px;font-weight:500;margin:0;" id="spike-out">+48%</p>
+    </div>
+    <div style="background:var(--surface-1);border-radius:var(--radius);padding:1rem;">
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 4px;">Your $5 latte becomes</p>
+      <p style="font-size:24px;font-weight:500;margin:0;" id="latte-out">$5.19</p>
+    </div>
+  </div>
+  <div style="margin:1rem 0;position:relative;height:280px;">
+    <canvas id="elasticity-chart" role="img" aria-label="Line chart of projected arabica futures price increase against Latin American yield shock from 0 to 30 percent, with a marker at the current setting">At a 15 percent yield shock, futures prices rise about 48 percent in this illustrative model.</canvas>
+  </div>
+</section>
+
+<footer>
+  Sources: USDA Foreign Agricultural Service, International Coffee Organization, Fairtrade International, Specialty Coffee Association, International Trade Centre Coffee Exporter's Guide.
+  Export and import figures are 2025/26 estimates in 60kg bags. Simulator assumptions: ~3.2x historical price elasticity to a Latin American yield shock, green coffee beans equal roughly 8% of a finished retail cup price, baseline arabica futures $2.75/lb, baseline latte $5.00.
+  Map built with D3.js and TopoJSON (Natural Earth).
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<script>
+const exportData = { "Brazil": 47, "Vietnam": 24.6, "Colombia": 10.7, "Ethiopia": 7.8, "Indonesia": 6.5, "Uganda": 6.75, "Honduras": 5.5 };
+const importNotes = {
+  "United States of America": "imports about 23.4M bags a year",
+  "Germany": "is part of the EU coffee-import bloc, 46.2M bags in 2025/26",
+  "Italy": "is part of the EU coffee-import bloc, 46.2M bags in 2025/26",
+  "France": "is part of the EU coffee-import bloc, 46.2M bags in 2025/26",
+  "Belgium": "is part of the EU coffee-import bloc, 46.2M bags in 2025/26",
+  "Japan": "is one of the largest single coffee-importing markets globally"
+};
+const coral = d3.scaleLinear().domain([0,47]).range(["#F0997B","#712B13"]);
+const svg = d3.select("#coffee-map").append("svg").attr("viewBox","0 0 960 500").attr("width","100%").style("display","block");
+const projection = d3.geoNaturalEarth1().scale(155).translate([480,250]);
+const geoPathFn = d3.geoPath(projection);
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
+  const countries = topojson.feature(world, world.objects.countries).features;
+  const sel = svg.selectAll("path").data(countries).join("path")
+    .attr("d", geoPathFn)
+    .attr("stroke", "#F1EFE8")
+    .attr("stroke-width", 0.5)
+    .attr("fill", d => {
+      const name = d.properties.name;
+      if (exportData[name] !== undefined) return coral(exportData[name]);
+      if (importNotes[name] !== undefined) return "#5DCAA5";
+      return "#D3D1C7";
+    });
+  sel.append("title").text(d => {
+    const name = d.properties.name;
+    if (exportData[name] !== undefined) return name + " exports about " + exportData[name] + "M 60kg bags a year";
+    if (importNotes[name] !== undefined) return name + " " + importNotes[name];
+    return name;
+  });
+});
+</script>
+
+<script>
+const elasticity = 3.2;
+const greenBeanShare = 0.08;
+const baseFutures = 2.75;
+const baseLatte = 5.00;
+const simLabels = [];
+const simCurve = [];
+for (let i = 0; i <= 30; i++) { simLabels.push(i + "%"); simCurve.push(Math.round(i * elasticity)); }
+const elasticityCtx = document.getElementById("elasticity-chart");
+const elasticityChart = new Chart(elasticityCtx, {
+  type: "line",
+  data: {
+    labels: simLabels,
+    datasets: [
+      { label: "Projected futures move", data: simCurve, borderColor: "#2a78d6", borderWidth: 2, pointRadius: 0, tension: 0.3 },
+      { label: "Current setting", data: simLabels.map((l,i) => i === 15 ? simCurve[i] : null), borderColor: "#e34948", backgroundColor: "#e34948", pointRadius: 8, showLine: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { title: { display: true, text: "Futures price move (%)" } },
+      x: { title: { display: true, text: "Latin American yield shock (%)" }, ticks: { autoSkip: true } }
+    }
+  }
+});
+const yieldSlider = document.getElementById("yield-shock");
+function updateSimulator() {
+  const shock = parseFloat(yieldSlider.value);
+  document.getElementById("yield-shock-out").textContent = shock + "%";
+  const spike = Math.round(shock * elasticity);
+  const futures = (baseFutures * (1 + spike/100)).toFixed(2);
+  const latteImpact = spike * greenBeanShare;
+  const latte = (baseLatte * (1 + latteImpact/100)).toFixed(2);
+  document.getElementById("spike-out").textContent = "+" + spike + "%";
+  document.getElementById("futures-out").textContent = "$" + futures + "/lb";
+  document.getElementById("latte-out").textContent = "$" + latte;
+  elasticityChart.data.datasets[1].data = simLabels.map((l,i) => i === Math.round(shock) ? simCurve[i] : null);
+  elasticityChart.update();
+}
+yieldSlider.addEventListener("input", updateSimulator);
+updateSimulator();
+</script>
+
+</body>
+</html>
